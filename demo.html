@@ -21,9 +21,30 @@
 </head>
 <body>
     <div class="container">
+        <div class="hero-unit">
+            <h1>
+                A quick and dirty demo</h1>
+            <p>
+                This is a very quick and dirty demo. Should get you up to speed with how this works.</p>
+        </div>
+        <div class="alert alert-success" id="div-status">
+        </div>
         <div class="row">
-            <input type="text" data-bind="value:firstName" />
-            <input type="text" data-bind="value:lastName" />
+            <div class="span12">
+                <a href="#" class="btn btn-primary" data-bind="click: addNew"><i class="icon-plus icon-white">
+                </i>&nbsp;Add New</a>
+                <br />
+                <br />
+            </div>
+            <div data-bind="foreach: people() " class="span4">
+                <div class="well-small alert-info">
+                    <label>
+                        First Name</label><input type="text" data-bind="value: $data.firstName" />
+                    <label>
+                        Last Name</label><input type="text" data-bind="value: $data.lastName" />
+                </div>
+                <br />
+            </div>
         </div>
         <hr>
         <footer>
@@ -44,19 +65,39 @@
 
             ko.bitchslap.init({ stateField: "state" });
 
-            var stateTrackedModel = new ko.bitchslap.stateTrackedModel({
+            var stateTrackedItem = new ko.bitchslap.stateTrackedModel({
                 firstName: "Eric",
                 lastName: "Cartman",
                 state: ko.bitchslap.states.UNCHANGED,
                 change: function (item) {
-                    alert(item.stateName());
+                    $("#div-status").html("StateId: " + item.state + " State Name: " + item.stateName());
                 },
                 revert: function (item) {
-                    alert(item.state);
+                    $("#div-status").html("StateId: " + item.state + " State Name: " + item.stateName());
                 }
             });
 
-            ko.applyBindings(stateTrackedModel);
+            viewModel = {};
+            viewModel.people = new ko.observableArray();
+            viewModel.people.push(stateTrackedItem);
+            viewModel.latestStateUpdate = ko.observable('');
+            viewModel.addNew = function () {
+
+                var stateTrackedItem = new ko.bitchslap.stateTrackedModel({
+                    firstName: "",
+                    lastName: "",
+                    state: ko.bitchslap.states.NEW,
+                    change: function (item) {
+                        $("#div-status").html("StateId: " + item.state + " State Name: " + item.stateName());
+                    },
+                    revert: function (item) {
+                        $("#div-status").html( "StateId: " + item.state + " State Name: " + item.stateName());
+                    }
+                });
+                viewModel.people.push(stateTrackedItem);
+            }
+
+            ko.applyBindings(viewModel);
         });
     </script>
 </body>

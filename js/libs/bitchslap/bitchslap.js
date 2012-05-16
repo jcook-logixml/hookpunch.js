@@ -21,10 +21,6 @@
 
             ko.extenders.trackState = function (target, options) {
 
-                if (options.parent[bitchslap.options.stateField] == undefined) {
-                    throw "Bitch please! Make sure you've initialised the correct stateField in ko.bitchslap.init({ stateField: '[Your field name here]'});";
-                }
-
                 target.parent = options.parent;
                 target.originalValue = options.originalValue;
                 target.originalState = options.parent[bitchslap.options.stateField]();
@@ -34,7 +30,7 @@
                 }
 
                 target.subscribe(function (newValue) {
-
+                    
                     var changed = target.originalValue !== newValue;
                     if (changed) {
                         // new Objects
@@ -60,7 +56,6 @@
                         }
                     }
                 });
-                console.dir(target.parent);
                 return target;
             };
 
