@@ -11,7 +11,7 @@
         CHANGED: 2,
         UNCHANGED: 3
         //DELETED :4 //coming soon
-    }    
+    }
 
     bitchslap.initialised = false;
 
@@ -21,6 +21,10 @@
             $.extend(bitchslap.options, options);
 
             ko.extenders.trackState = function (target, options) {
+
+                if (options.parent[bitchslap.options.stateField] == undefined) {
+                    throw "Bitch please! Make sure you've initialised the correct stateField in ko.bitchslap.init({ stateField: '[Your field name here]'});";
+                }
 
                 target.parent = options.parent;
                 target.originalValue = options.originalValue;

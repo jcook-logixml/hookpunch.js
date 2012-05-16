@@ -41,11 +41,11 @@
     <script>
         $(document).ready(function () {
 
-            ko.bitchslap.init({stateField:"State"});
+            ko.bitchslap.init({ stateField: "State" });
 
             var stateTrackedModel = new ko.bitchslap.stateTrackedModel({
-                Name: "johann",
-                State: ko.bitchslap.states.UNCHANGED,
+                name: "Mr. Garrison",
+                state: ko.bitchslap.states.UNCHANGED,
                 change: function (item) {
                     alert(item.State);
                 },
