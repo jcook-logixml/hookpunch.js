@@ -1,0 +1,29 @@
+.hero-unit h1
+{
+    font-size:4em;
+    margin-bottom:16px;
+}
+
+.bitchslap
+{
+    color:hotpink;
+}
+
+.text-block-image
+{
+    vertical-align:text-top;
+    margin-right:8px;
+}
+                         
+.center-content > .span4
+{
+    height:180px;
+    min-height: 180px;
+}
+.center-content > .span4 > .btn
+{
+    position:relative;
+    display:inline-block;
+    left:0px;
+	bottom:0px;
+}
