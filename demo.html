@@ -22,7 +22,8 @@
 <body>
     <div class="container">
         <div class="row">
-            <input type="text" data-bind="value:Name" />
+            <input type="text" data-bind="value:firstName" />
+            <input type="text" data-bind="value:lastName" />
         </div>
         <hr>
         <footer>
@@ -41,16 +42,17 @@
     <script>
         $(document).ready(function () {
 
-            ko.bitchslap.init({stateField:"State"});
+            ko.bitchslap.init({ stateField: "state" });
 
             var stateTrackedModel = new ko.bitchslap.stateTrackedModel({
-                Name: "johann",
-                State: ko.bitchslap.states.UNCHANGED,
+                firstName: "Eric",
+                lastName: "Cartman",
+                state: ko.bitchslap.states.UNCHANGED,
                 change: function (item) {
-                    alert(item.State);
+                    alert(item.stateName());
                 },
                 revert: function (item) {
-                    alert(item.State);
+                    alert(item.state);
                 }
             });
 

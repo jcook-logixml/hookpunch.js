@@ -2,29 +2,32 @@
 
     var bitchslap = this;
 
-    bitchslap.options = {
-        stateField: "State"
-    };
+    bitchslap.options = null;
 
     bitchslap.states = {
         NEW: 1,
         CHANGED: 2,
         UNCHANGED: 3
         //DELETED :4 //coming soon
-    }    
+    }
 
-    bitchslap.initialised = false;
+    initialised = false;
 
     bitchslap.init = function (options) {
+
         if (!bitchslap.initialised) {
 
-            $.extend(bitchslap.options, options);
+            bitchslap.options = $.extend({}, bitchslap.options, options);
 
             ko.extenders.trackState = function (target, options) {
 
                 target.parent = options.parent;
                 target.originalValue = options.originalValue;
                 target.originalState = options.parent[bitchslap.options.stateField]();
+
+                if (options.parent[bitchslap.options.stateField] === undefined) {
+                    throw "Bitch please! Make sure you've initialised the correct stateField in ko.bitchslap.init({ stateField: '[Your field name here]'});";
+                }
 
                 target.subscribe(function (newValue) {
 
@@ -70,8 +73,17 @@
                 self[prop].extend({ trackState: { parent: self, originalValue: self[prop]()} });
             }
         }
+
+        self.stateName = function () {
+
+            for (state in bitchslap.states) {
+                var myState = this[bitchslap.options.stateField];
+                if (bitchslap.states[state] === myState) {
+                    return state;
+                }
+            }
+        };
+
         return self;
     }
-
-    bitchslap.init();
 });
