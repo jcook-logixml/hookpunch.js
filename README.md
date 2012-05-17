@@ -71,4 +71,3 @@ Here's how it works:
 				globalRevert: itemReverted 
 			});
 ```
-
