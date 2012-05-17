@@ -28,8 +28,7 @@
                 This is a very quick and dirty demo. Should get you up to speed with how this works.</p>
         </div>
         <div class="alert alert-success" id="div-status">
-            Watch this space for change event
-            messages.
+            Watch this space for change event messages.
         </div>
         <div class="row">
             <div class="span12">
@@ -65,7 +64,15 @@
     <script>
         $(document).ready(function () {
 
-            ko.hookpunch.init({ stateField: "state" });
+            function itemChanged(item) {
+                console.log(item.firstName() + " was changed");
+            }
+
+            function itemReverted(item) {
+                console.log(item.firstName() + " was reverted");
+            }
+
+            ko.hookpunch.init({ stateField: "state", globalChange: itemChanged, globalRevert: itemReverted });
 
             var stateTrackedItem = new ko.hookpunch.stateTrackedModel({
                 firstName: "Eric",

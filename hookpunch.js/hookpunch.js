@@ -21,38 +21,48 @@
 
             ko.extenders.trackState = function (target, options) {
 
-                target.parent = options.parent;
+                target.originalObject = options.originalObject;
                 target.originalValue = options.originalValue;
-                target.originalState = options.parent[hookpunch.options.stateField]();
+                target.originalState = options.originalObject[hookpunch.options.stateField]();
 
-                if (options.parent[hookpunch.options.stateField] === undefined) {
+                if (options.originalObject[hookpunch.options.stateField] === undefined) {
                     throw "Make sure you've initialised the correct stateField in ko.hookpunch.init({ stateField: '[Your field name here]'});";
                 }
 
                 target.subscribe(function (newValue) {
-                    
+
                     var changed = target.originalValue !== newValue;
                     if (changed) {
                         // new Objects
                         if (target.originalState == hookpunch.states.NEW) {
-                            target.parent[hookpunch.options.stateField] = hookpunch.states.NEW;
+                            target.originalObject[hookpunch.options.stateField] = hookpunch.states.NEW;
                         } else if (target.originalState == hookpunch.states.UNCHANGED) {
-                            target.parent[hookpunch.options.stateField] = hookpunch.states.CHANGED;
+                            target.originalObject[hookpunch.options.stateField] = hookpunch.states.CHANGED;
                         }
                         //fire the event when a change is detected
-                        if (target.parent.change) {
-                            target.parent.change(target.parent);
+                        if (target.originalObject.change) {
+                            target.originalObject.change(target.originalObject);
+                        }
+
+                        // fire the global event handler for change
+                        if (hookpunch.options.globalChange) {
+                            hookpunch.options.globalChange(target.originalObject);
                         }
                     } else {
                         // new Objects
                         if (target.originalState == hookpunch.states.NEW) {
-                            target.parent[hookpunch.options.stateField] = hookpunch.states.NEW;
+                            target.originalObject[hookpunch.options.stateField] = hookpunch.states.NEW;
                         } else if (target.originalState == hookpunch.states.UNCHANGED) {
-                            target.parent[hookpunch.options.stateField] = hookpunch.states.UNCHANGED;
+                            target.originalObject[hookpunch.options.stateField] = hookpunch.states.UNCHANGED;
                         }
                         //fire the event when a change is detected
-                        if (target.parent.revert) {
-                            target.parent.revert(target.parent);
+                        if (target.originalObject.revert) {
+                            target.originalObject.revert(target.originalObject);
+                        }
+
+                        // fire the global event handler for change
+                        if (hookpunch.options.globalRevert) {
+                            hookpunch.options.globalRevert(target.originalObject);
                         }
                     }
                 });
@@ -69,7 +79,7 @@
         var self = this;
         for (prop in self) {
             if (self[prop] != null && self[prop].extend != undefined && prop != hookpunch.options.stateField) {
-                self[prop].extend({ trackState: { parent: self, originalValue: self[prop]()} });
+                self[prop].extend({ trackState: { originalObject: self, originalValue: self[prop]()} });
             }
         }
 
