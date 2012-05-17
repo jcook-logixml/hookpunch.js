@@ -26,7 +26,7 @@
                 target.originalState = options.parent[hookpunch.options.stateField]();
 
                 if (options.parent[hookpunch.options.stateField] === undefined) {
-                    throw "Bitch please! Make sure you've initialised the correct stateField in ko.hookpunch.init({ stateField: '[Your field name here]'});";
+                    throw "Make sure you've initialised the correct stateField in ko.hookpunch.init({ stateField: '[Your field name here]'});";
                 }
 
                 target.subscribe(function (newValue) {
