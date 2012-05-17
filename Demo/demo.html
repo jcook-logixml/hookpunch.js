@@ -37,12 +37,19 @@
                 <br />
                 <br />
             </div>
-            <div data-bind="foreach: people() " class="span4">
-                <div class="well-small alert-info">
-                    <label>
-                        First Name</label><input type="text" data-bind="value: $data.firstName" />
-                    <label>
-                        Last Name</label><input type="text" data-bind="value: $data.lastName" />
+            <div data-bind="foreach: people() " class="span12">
+                <div class="well alert-info row">
+                    <div class="span4 form-inline">
+                        <label>
+                            First Name&nbsp;&nbsp;</label><input type="text" data-bind="value: $data.firstName" /><br />
+                        <br />
+                        <label>
+                            Last Name&nbsp;&nbsp;</label><input type="text" data-bind="value: $data.lastName" />
+                    </div>
+                    <div class="span2">
+                        <a href="#" class="btn btn-primary pull-right" data-bind="click: undo"><i class="icon-plus icon-white">
+                        </i>&nbsp;Undo Changes</a>
+                    </div>
                 </div>
                 <br />
             </div>
@@ -66,17 +73,26 @@
 
             function itemChanged(item) {
                 console.log(item.firstName() + " was changed");
+                console.log("Item has " + ko.hookpunch.undoLevels(item) + " undo levels");
+                console.log(item.state);
             }
 
             function itemReverted(item) {
                 console.log(item.firstName() + " was reverted");
+                console.log("Item has " + ko.hookpunch.undoLevels(item) + " undo levels");
+                console.log(item.state);
             }
 
-            ko.hookpunch.init({ stateField: "state", globalChange: itemChanged, globalRevert: itemReverted });
+            ko.hookpunch.init({
+                stateField: "state",
+                history: true,
+                globalChange: itemChanged,
+                globalRevert: itemReverted
+            });
 
             var stateTrackedItem = new ko.hookpunch.stateTrackedModel({
-                firstName: "Eric",
-                lastName: "Cartman",
+                firstName: ko.observable("Eric"),
+                lastName: ko.observable("Cartman"),
                 state: ko.hookpunch.states.UNCHANGED,
                 change: function (item) {
                     $("#div-status").html("StateId: " + item.state + " State Name: " + item.stateName());

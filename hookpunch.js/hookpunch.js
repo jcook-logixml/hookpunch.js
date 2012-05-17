@@ -1,5 +1,12 @@
 ﻿ko.hookpunch = new (function () {
 
+    // Array Remove - By John Resig (MIT Licensed) - TODO: clean this up later.
+    Array.prototype.remove = function (from, to) {
+        var rest = this.slice((to || from) + 1 || this.length);
+        this.length = from < 0 ? this.length + from : from;
+        return this.push.apply(this, rest);
+    };
+
     var hookpunch = this;
 
     hookpunch.options = null;
@@ -19,6 +26,48 @@
 
             hookpunch.options = $.extend({}, hookpunch.options, options);
 
+            // returns how many undo levels are in memory, should probably limit this some time.
+            ko.hookpunch.undoLevels = function (item) {
+
+                var undoLevels = 0;
+                if (item.history) {
+                    undoLevels = item.history.length;
+                }
+
+                return undoLevels;
+            }
+
+            ko.extenders.trackHistory = function (target, options) {
+
+                target.originalObject = options.originalObject;
+
+                //check that the history array exists
+                if (!target.originalObject.history && hookpunch.options.history) {
+                    target.originalObject.history = new Array();
+                    target.originalObject.history.push(ko.mapping.toJS(target.originalObject));
+                }
+
+                target.subscribe(function (newValue) {
+
+                    //todo: this is far from perfect. State doesn't always undo correctly
+                    if (target.originalObject.history && hookpunch.options.history) {
+
+                        var clonedObject = ko.mapping.toJS(target.originalObject);
+                        var lastAddedHistoryItem = target.originalObject.history[target.originalObject.history.length - 1];
+                        clonedObject[ko.hookpunch.options.stateField] = 2;
+
+                        var isDuplicate = false;
+                        if (target.originalObject.history.length > 1 && ko.mapping.toJSON(lastAddedHistoryItem) === ko.mapping.toJSON(clonedObject)) {
+                            isDuplicate = true;
+                        }
+
+                        if (!isDuplicate) {
+                            target.originalObject.history.push(clonedObject);
+                        }
+                    }
+                });
+            };
+
             ko.extenders.trackState = function (target, options) {
 
                 target.originalObject = options.originalObject;
@@ -33,6 +82,7 @@
 
                     var changed = target.originalValue !== newValue;
                     if (changed) {
+
                         // new Objects
                         if (target.originalState == hookpunch.states.NEW) {
                             target.originalObject[hookpunch.options.stateField] = hookpunch.states.NEW;
@@ -75,11 +125,26 @@
 
     hookpunch.stateTrackedModel = function (data) {
 
-        ko.mapping.fromJS(data, {}, this);
         var self = this;
-        for (prop in self) {
-            if (self[prop] != null && self[prop].extend != undefined && prop != hookpunch.options.stateField) {
-                self[prop].extend({ trackState: { originalObject: self, originalValue: self[prop]()} });
+
+        self.init = function (data, hookevents) {
+
+            ko.mapping.fromJS(data, {}, self);
+            if (hookevents) {
+                for (prop in self) {
+                    if (self[prop] != null && self[prop].extend != undefined && prop != hookpunch.options.stateField) {
+                        self[prop].extend({ trackState: { originalObject: self, originalValue: self[prop]()} });
+                        self[prop].extend({ trackHistory: { originalObject: self, propertyName: prop} });
+                    }
+                }
+            }
+        }
+
+        self.undo = function () {
+            if (self.history.length > 1) {
+                var itemToUndoTo = self.history[self.history.length - 2];
+                self.history.remove(self.history.length - 1); // remove the last item
+                self.init(itemToUndoTo, false);
             }
         }
 
@@ -91,8 +156,9 @@
                     return state;
                 }
             }
-        };
+        }
 
+        self.init(data, true);
         return self;
     }
 });
