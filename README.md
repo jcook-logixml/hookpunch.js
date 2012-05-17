@@ -73,7 +73,7 @@ Here's how it works:
 ```
 ##History
 
-#Basic Usage 
+###Basic Usage 
 
 History support is now working. You can specify that history should be tracked on objects by setting `history` to `true` in the init options.
 
@@ -88,7 +88,7 @@ History support is now working. You can specify that history should be tracked o
 
 This will give your `ko.hookpunch.stateTrackedModel` objects a `history` property.
 
-#Undo Levels	
+###Undo Levels	
 
 Undo support is a work in progress. You can see how many levels of undo are available in the following way.
 
