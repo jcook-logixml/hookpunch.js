@@ -47,3 +47,22 @@ Then, apply the Knockout.js bindings to the stateTrackedModel
 ```
 
 That should get you going.
+
+##Global Events
+
+**hookpunch** allows for hooking into global events that fire when any object is changed or reverted to its original state. 
+
+Here's how it works:
+
+```js
+            function itemChanged(item) {
+                console.log(item.someProperty() + " was changed");
+            }
+
+            function itemReverted(item) {
+                console.log(item.someProperty() + " was reverted");
+            }
+
+            ko.hookpunch.init({ stateField: "state", globalChange: itemChanged, globalRevert: itemReverted });
+```
+
