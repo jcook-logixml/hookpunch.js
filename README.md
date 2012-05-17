@@ -57,41 +57,47 @@ That should get you going.
 Here's how it works:
 
 ```js
-            function itemChanged(item) {
-                console.log(item.someProperty() + " was changed");
-            }
+    function itemChanged(item) {
+        console.log(item.someProperty() + " was changed");
+    }
 
-            function itemReverted(item) {
-                console.log(item.someProperty() + " was reverted");
-            }
+    function itemReverted(item) {
+        console.log(item.someProperty() + " was reverted");
+    }
 
-            ko.hookpunch.init({ 
-				stateField: "state", 
-				globalChange: itemChanged, 
-				globalRevert: itemReverted 
-			});
+    ko.hookpunch.init({ 
+		stateField: "state", 
+		globalChange: itemChanged, 
+		globalRevert: itemReverted 
+	});
 ```
 ##History
 
-###Basic Usage 
+###How to set it up
 
 History support is now working. You can specify that history should be tracked on objects by setting `history` to `true` in the init options.
 
 ```js
-            ko.hookpunch.init({
-                stateField: "state",
-                history: true,
-                globalChange: itemChanged,
-                globalRevert: itemReverted
-            });
+    ko.hookpunch.init({
+        stateField: "state",
+        history: true,
+        globalChange: itemChanged,
+        globalRevert: itemReverted
+    });
 ```
 
 This will give your `ko.hookpunch.stateTrackedModel` objects a `history` property.
+
+```js
+	
+	console.dir(myStateTrackedItem.history);
+
+```
 
 ###Undo Levels	
 
 Undo support is a work in progress. You can see how many levels of undo are available in the following way.
 
 ```js
-                console.log("Item has " + ko.hookpunch.undoLevels(item) + " undo levels");
+    console.log("Item has " + ko.hookpunch.undoLevels(item) + " undo levels");
 ```
