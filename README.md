@@ -6,8 +6,9 @@ It also provides helper functions for *filtering out only the objects that have 
 observableCollections. This is useful when working with serialized server objects on the client 
 side, or when you *only want to send updated objects* back to the server.
 
-You only require the hookpunch.js script to make this work, but it does depend on [knockout] and 
-the knockout mapping plugin.
+You only require the hookpunch.js scripts to make this work, but it does depend on [knockout] and 
+the knockout mapping plugin. I split the functionality into different files because it feel cleaner 
+and makes more sense to me that way. The minified 
 
 ##Basic Usage
 
@@ -16,10 +17,7 @@ First, include the knockout, knockout mapping and hookpunch.js scripts.
 ```js
 	<script src="js/libs/knockout-2.1.0.js"></script>
 	<script src="js/libs/knockout.mapping-latest.debug.js" type="text/javascript"></script>
-    <script src="../hookpunch.js/hookpunch.js" type="text/javascript"></script>
-    <script src="../hookpunch.js/hookpunch.history.js" type="text/javascript"></script>
-    <script src="../hookpunch.js/hookpunch.parentLink.js" type="text/javascript"></script>
-    <script src="../hookpunch.js/hookpunch.trackState.js" type="text/javascript"></script>
+    <script src="../hookpunch.js/hookpunch.min.js" type="text/javascript"></script>
 ```
 
 Then, initialise hookpunch.js with the field that you want to track.

@@ -1,0 +1,1 @@
+type "..\src\js\*.js" > "..\lib\hookpunch.debug.js"
