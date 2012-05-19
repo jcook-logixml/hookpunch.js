@@ -6,11 +6,43 @@ hookpunch = (function () {
 
     var hookpunch = {};
 
+    hookpunch.states = {
+        NEW: 1,
+        CHANGED: 2,
+        UNCHANGED: 3
+    }
+
     hookpunch.options = null;
     hookpunch.initialised = false;
 
     // to initialise everything
     hookpunch.init = function (options) {
+
+        if (!Array.prototype.filter) {
+            Array.prototype.filter = function (fun /*, thisp */) {
+                "use strict";
+
+                if (this == null)
+                    throw new TypeError();
+
+                var t = Object(this);
+                var len = t.length >>> 0;
+                if (typeof fun != "function")
+                    throw new TypeError();
+
+                var res = [];
+                var thisp = arguments[1];
+                for (var i = 0; i < len; i++) {
+                    if (i in t) {
+                        var val = t[i]; // in case fun mutates this  
+                        if (fun.call(thisp, val, i, t))
+                            res.push(val);
+                    }
+                }
+
+                return res;
+            };
+        }
 
         if (!hookpunch.initialised) {
 
@@ -51,7 +83,7 @@ hookpunch = (function () {
             self._hookpunch.id = self.getUniqueId();
             self._hookpunch.undoCalled = false;
 
-            hookpunch.history[self._hookpunch.id] = { originalObject: data, itemHistory: new Array() };
+            hookpunch.history[self._hookpunch.id] = { originalObject: data, changes: new Array() };
 
             for (prop in self) {
                 if (self[prop] != null && self[prop].extend != undefined && prop != hookpunch.options.stateField) {
@@ -74,83 +106,35 @@ hookpunch = (function () {
 
         self.undo = function () {
 
-            var itemHistory = hookpunch.history[self._hookpunch.id].itemHistory;
-            if (itemHistory.length > 0) {
+            var changes = hookpunch.history[self._hookpunch.id].changes;
 
-                itemHistory.reverse();
-                for (item in itemHistory) {
+            var lastChange = changes.splice(0, 1)[0];
+            if (lastChange) {
+                var changeFound = false;
+                for (index in changes) {
 
-                    var historyItem = itemHistory[item];
-                    if (historyItem.latest || historyItem.ignore) {
-                        historyItem.ignore = true;
-                        continue;
-                    } else {
-                        if (historyItem !== undefined) {
-                            console.log(historyItem.propertyName + " " + historyItem.value);
-                            itemHistory[item].latest = true;
-                            itemHistory[item].latest = true;
-                            self._hookpunch.undoCalled = true;
+                    var change = changes[index];
+                    if (change.propertyName === lastChange.propertyName && change.version !== lastChange.version) {
 
-                            self[historyItem.propertyName] = ko.observable(historyItem.value);
-                            break;
-                        }
+                        changeFound = true;
+                        hookpunch.history.undoFlag = true;
+                        hookpunch.history.busyRevertingValue = true;
+                        self[lastChange.propertyName].version = change.version;
+                        self[lastChange.propertyName](change.value);
+                        hookpunch.history.busyRevertingValue = false;
+
+                        break;
                     }
                 }
 
-                //                itemHistory.reverse();
-                //                do {
-                //                    itemState = itemHistory.pop();
-                //                } while (itemState.latest && itemHistory.length > 0)
-
-                //                if (itemState) {
-                //                    console.log(JSON.stringify(itemState));
-                //                    console.dir(itemHistory);
-                //                    //self[itemState.propertyName](itemState.value);
-                //                }
-
+                if (!changeFound) {
+                    hookpunch.history.undoFlag = true;
+                    hookpunch.history.busyRevertingValue = true;
+                    self[lastChange.propertyName].version = 0;
+                    self[lastChange.propertyName](self[lastChange.propertyName].originalValue);
+                    hookpunch.history.busyRevertingValue = false;
+                }
             }
-
-            //            latestItems = ko.utils.arrayFilter(itemHistory, function (item) {
-            //                return !item.latest;
-            //            });
-
-            //            console.dir(latestItems);
-            //            console.log(self._hookpunch.lastUndoField);
-            //            if (self._hookpunch.lastUndoField == undefined) {
-
-            //                var lastAddedHistoryItem = itemHistory[itemHistory.length - 1];
-            //                self._hookpunch.lastUndoField = lastAddedHistoryItem.propertyName;
-            //            } else if (self._hookpunch.lastUndoField != itemHistory.propertyName) {
-
-            //                var lastAddedHistoryItem = itemHistory.pop();
-            //                self._hookpunch.lastUndoField = lastAddedHistoryItem.propertyName;
-            //            }
-
-
-
-            //            console.dir(itemHistory);
-
-            //var previousFieldState = itemHistory.pop();
-
-            // console.log("previous state: " + JSON.stringify(previousFieldState));
-
-            //            if (itemHistory.length > 1) {
-
-            //                var previousState = itemHistory[itemHistory.length - 2];
-            //                self[lastUpdatedField](previousState);
-            //                delete itemHistory[itemHistory.length - 1];
-            //                delete itemHistory[itemHistory.length - 2];
-            //                itemHistory.length = itemHistory.length - 2;
-            //                console.dir(itemHistory);
-            //            } else {
-            //            }
-
-            //console.dir(hookpunch.history[self._hookpunch.id].itemHistory);
-
-
-
-            //hookpunch.history);
-            //console.dir(target);
         }
 
         self.stateName = function () {

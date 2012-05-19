@@ -9,7 +9,7 @@ hookpunch.history = (function () {
     hookpunch.history.init = function () {
         if (!hookpunch.initialised) {
             if (hookpunch.options.history) {
-                hookpunch.history = {};
+                hookpunch.history = { undoFlag: false, busyRevertingValue: false };
             }
         }
     }
@@ -18,26 +18,31 @@ hookpunch.history = (function () {
 
         target.propertyName = options.propertyName;
         target.revertValue = target.originalState[target.propertyName];
+        target.version = 0;
 
         target.subscribe(function (newValue) {
 
-            var hookpunchId = target.parent._hookpunch.id;
+            if (!hookpunch.history.busyRevertingValue) {
 
-            if (!hookpunch.history[hookpunchId].itemHistory) {
-                hookpunch.history[hookpunchId].itemHistory = [];
-            }
+                var hookpunchId = target.parent._hookpunch.id;
 
-            if (target.parent._hookpunch.undoCalled) {
-                target.parent._hookpunch.undoCalled = false;
-                hookpunch.history[hookpunchId].itemHistory = [];
-            }
-
-            for (item in hookpunch.history[hookpunchId].itemHistory) {
-                if (hookpunch.history[hookpunchId].itemHistory[item].propertyName == options.propertyName) {
-                    hookpunch.history[hookpunchId].itemHistory[item].latest = false;
+                if (!hookpunch.history[hookpunchId].changes) {
+                    hookpunch.history[hookpunchId].changes = [];
                 }
+
+                if (hookpunch.history.undoFlag) {
+                    hookpunch.history[hookpunchId].changes = [];
+                    target.version = 0;
+                    hookpunch.history.undoFlag = false;
+                }
+
+                target.version = ++target.version;
+                hookpunch.history[hookpunchId].changes.splice(0, 0, {
+                    propertyName: options.propertyName,
+                    value: target(),
+                    version: target.version
+                });
             }
-            hookpunch.history[hookpunchId].itemHistory.push({ propertyName: options.propertyName, value: target(), latest: true });
         });
     }
 
