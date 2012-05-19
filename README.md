@@ -16,22 +16,25 @@ First, include the knockout, knockout mapping and hookpunch.js scripts.
 ```js
 	<script src="js/libs/knockout-2.1.0.js"></script>
 	<script src="js/libs/knockout.mapping-latest.debug.js" type="text/javascript"></script>
-	<script src="../hookpunch.js/hookpunch.js" type="text/javascript"></script>
+    <script src="../hookpunch.js/hookpunch.js" type="text/javascript"></script>
+    <script src="../hookpunch.js/hookpunch.history.js" type="text/javascript"></script>
+    <script src="../hookpunch.js/hookpunch.parentLink.js" type="text/javascript"></script>
+    <script src="../hookpunch.js/hookpunch.trackState.js" type="text/javascript"></script>
 ```
 
 Then, initialise hookpunch.js with the field that you want to track.
 
 ```js
-	ko.hookpunch.init({ stateField: "state" });
+	hookpunch.init({ stateField: "state" });
 ```
 
 Then, create a stateTrackedItem
 
 ```js
-	var stateTrackedItem = new ko.hookpunch.stateTrackedModel({
+	var stateTrackedItem = new hookpunch.observable({
         firstName: "Eric",
         lastName: "Cartman",
-        state: ko.hookpunch.states.UNCHANGED,
+        state: hookpunch.states.UNCHANGED,
         change: function (item) {
             // fires when an object changes; new objects 
 			// will always have a new state.
@@ -42,13 +45,27 @@ Then, create a stateTrackedItem
         }
     });
 ```
-Then, apply the Knockout.js bindings to the stateTrackedModel
+Then, apply the Knockout.js bindings to the observable
 
 ```js
 	ko.applyBindings(stateTrackedItem);
 ```
 
 That should get you going.
+
+###Undo!!!
+
+Undo is now supported and working 100%. Watch out though, it is destructive (ie. changes are rolled back permanently).
+
+*Support is coming soon for redo, which effectively gives us object versions :)*
+
+In a foreach, you can bind the click event for a button to the *undo* function on the `hookpunch.observable`. 
+
+Literally as simple as:
+
+```html
+	<a href="#" class="btn btn-primary pull-right" data-bind="click: undo">
+```
 
 ##Global Events
 
@@ -65,7 +82,7 @@ Here's how it works:
         console.log(item.someProperty() + " was reverted");
     }
 
-    ko.hookpunch.init({ 
+    hookpunch.init({ 
 		stateField: "state", 
 		globalChange: itemChanged, 
 		globalRevert: itemReverted 
@@ -78,7 +95,7 @@ Here's how it works:
 History support is now working. You can specify that history should be tracked on objects by setting `history` to `true` in the init options.
 
 ```js
-    ko.hookpunch.init({
+    hookpunch.init({
         stateField: "state",
         history: true,
         globalChange: itemChanged,
@@ -86,18 +103,10 @@ History support is now working. You can specify that history should be tracked o
     });
 ```
 
-This will give your `ko.hookpunch.stateTrackedModel` objects a `history` property.
+This will give your `hookpunch.observable` objects a `history` property.
 
 ```js
 	
-	console.dir(myStateTrackedItem.history);
+	console.dir(myItem.history);
 
-```
-
-###Undo Levels	
-
-Undo support is a work in progress. You can see how many levels of undo are available in the following way.
-
-```js
-    console.log("Item has " + ko.hookpunch.undoLevels(item) + " undo levels");
 ```
