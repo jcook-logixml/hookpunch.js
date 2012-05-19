@@ -53,7 +53,7 @@ Then, apply the Knockout.js bindings to the observable
 
 That should get you going.
 
-###Undo!!!
+##Undo Support!!!
 
 Undo is now supported and working 100%. Watch out though, it is destructive (ie. changes are rolled back permanently).
 
@@ -88,25 +88,5 @@ Here's how it works:
 		globalRevert: itemReverted 
 	});
 ```
-##History
 
-###How to set it up
-
-History support is now working. You can specify that history should be tracked on objects by setting `history` to `true` in the init options.
-
-```js
-    hookpunch.init({
-        stateField: "state",
-        history: true,
-        globalChange: itemChanged,
-        globalRevert: itemReverted
-    });
-```
-
-This will give your `hookpunch.observable` objects a `history` property.
-
-```js
-	
-	console.dir(myItem.history);
-
-```
+There are loads of features planned, watch this space.
