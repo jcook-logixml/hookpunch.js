@@ -110,6 +110,10 @@ hookpunch = (function () {
 
             var lastChange = changes.splice(0, 1)[0];
             if (lastChange) {
+
+                hookpunch.history.undoFlag = true;  // mark item as undone, any subsequent changes will delete history
+                hookpunch.history.busyRevertingValue = true; // ignore history tracking while we update the observables.
+
                 var changeFound = false;
                 for (index in changes) {
 
@@ -117,23 +121,19 @@ hookpunch = (function () {
                     if (change.propertyName === lastChange.propertyName && change.version !== lastChange.version) {
 
                         changeFound = true;
-                        hookpunch.history.undoFlag = true;
-                        hookpunch.history.busyRevertingValue = true;
                         self[lastChange.propertyName].version = change.version;
                         self[lastChange.propertyName](change.value);
-                        hookpunch.history.busyRevertingValue = false;
 
                         break;
                     }
                 }
 
                 if (!changeFound) {
-                    hookpunch.history.undoFlag = true;
-                    hookpunch.history.busyRevertingValue = true;
                     self[lastChange.propertyName].version = 0;
                     self[lastChange.propertyName](self[lastChange.propertyName].originalValue);
-                    hookpunch.history.busyRevertingValue = false;
                 }
+
+                hookpunch.history.busyRevertingValue = false; //resume history logging
             }
         }
 
