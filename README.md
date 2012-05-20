@@ -8,7 +8,10 @@ side, or when you *only want to send updated objects* back to the server.
 
 You only require the hookpunch.js scripts to make this work, but it does depend on [knockout] and 
 the knockout mapping plugin. I split the functionality into different files because it feel cleaner 
-and makes more sense to me that way. The minified 
+and makes more sense to me that way. 
+
+*Run the build.bat file in the Build folder to output the latest version as a minified and debug 
+build to the lib folder.*
 
 ##Basic Usage
 
