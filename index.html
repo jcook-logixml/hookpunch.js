@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>hookpunch.js by mightystassen</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/mightystassen/hookpunch.js">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/mightystassen/hookpunch.js/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/mightystassen/hookpunch.js/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>hookpunch.js</h1>
+          <p>beat some state into Knockout.js</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/mightystassen">mightystassen</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>hookpunch.js</h1>
+
+<p><strong>hookpunch.js</strong> (only 4kb minified) adds <em>state tracking</em>, <em>undo funtionality</em> and a link to the parent object to observable Knockout.js objects. <del>It also provides helper functions for filtering out only the objects that have changed from observableCollections.</del> (not yet, coming soon!).</p>
+
+<p>I reckon that this library will help developers who build rich web applications that are light on traffic (you can send back only changed objects) and heavy on functionality (you can now undo changes made to view models, soon you will be able to roll back to a specified version of a view model).</p>
+
+<p>You only require the hookpunch.js scripts to make this work, but it does depend on [knockout] and the knockout mapping plugin. I split the functionality into different files because it feel cleaner and makes more sense to me that way. </p>
+
+<p><em>Run the build.bat file in the Build folder to output the latest version as a debug and minified build to the lib folder.</em> A closurecmd tool is included in the build folder which requires the .NET framework to run. It hits the Google Closure compiler service to minify the script. The project page for this handy little tool is at <a href="http://mightystassen.github.com/closurecmd/">http://mightystassen.github.com/closurecmd/</a></p>
+
+<h2>Basic Usage</h2>
+
+<p>First, include the knockout, knockout mapping and hookpunch.js scripts.</p>
+
+<div class="highlight">
+<pre>    <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">"js/libs/knockout-2.1.0.js"</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
+    <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">"js/libs/knockout.mapping-latest.debug.js"</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"text/javascript"</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
+    <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">"../hookpunch.js/hookpunch.min.js"</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"text/javascript"</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
+</pre>
+</div>
+
+
+<p>Then, initialise hookpunch.js with the field that you want to track.</p>
+
+<div class="highlight">
+<pre>    <span class="nx">hookpunch</span><span class="p">.</span><span class="nx">init</span><span class="p">({</span> <span class="nx">stateField</span><span class="o">:</span> <span class="s2">"state"</span> <span class="p">});</span>
+</pre>
+</div>
+
+
+<p>Then, create a <em>hookpunch</em> observable</p>
+
+<div class="highlight">
+<pre>    <span class="kd">var</span> <span class="nx">stateTrackedItem</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">hookpunch</span><span class="p">.</span><span class="nx">observable</span><span class="p">({</span>
+        <span class="nx">firstName</span><span class="o">:</span> <span class="s2">"Eric"</span><span class="p">,</span>
+        <span class="nx">lastName</span><span class="o">:</span> <span class="s2">"Cartman"</span><span class="p">,</span>
+        <span class="nx">state</span><span class="o">:</span> <span class="nx">hookpunch</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">UNCHANGED</span><span class="p">,</span>
+        <span class="nx">change</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// fires when an object changes; new objects </span>
+            <span class="c1">// will always have a new state.</span>
+        <span class="p">},</span>
+        <span class="nx">revert</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// fires when the object state is reverted to its </span>
+            <span class="c1">// original state, not fired for new objects.</span>
+        <span class="p">}</span>
+    <span class="p">});</span>
+</pre>
+</div>
+
+
+<p>Then, apply the Knockout.js bindings to the observable</p>
+
+<div class="highlight">
+<pre>    <span class="nx">ko</span><span class="p">.</span><span class="nx">applyBindings</span><span class="p">(</span><span class="nx">stateTrackedItem</span><span class="p">);</span>
+</pre>
+</div>
+
+
+<p>That should get you going.</p>
+
+<h2>Undo Support!!!</h2>
+
+<p>Undo is now supported and working 100%. Watch out though, it is destructive (ie. changes are rolled back permanently).</p>
+
+<p><em>Support is coming soon for redo, which effectively gives us object versions :)</em></p>
+
+<p>In a foreach, you can bind the click event for a button to the <em>undo</em> function on the <code>hookpunch.observable</code>. </p>
+
+<p>Literally as simple as:</p>
+
+<div class="highlight">
+<pre>    <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"#"</span> <span class="na">class=</span><span class="s">"btn btn-primary pull-right"</span> <span class="na">data-bind=</span><span class="s">"click: undo"</span><span class="nt">&gt;</span>
+</pre>
+</div>
+
+
+<h2>Global Events</h2>
+
+<p><strong>hookpunch</strong> allows for hooking into global events that fire when any object is changed or reverted to its original state. </p>
+
+<p>Here's how it works:</p>
+
+<div class="highlight">
+<pre>    <span class="kd">function</span> <span class="nx">itemChanged</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">someProperty</span><span class="p">()</span> <span class="o">+</span> <span class="s2">" was changed"</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">itemReverted</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">someProperty</span><span class="p">()</span> <span class="o">+</span> <span class="s2">" was reverted"</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nx">hookpunch</span><span class="p">.</span><span class="nx">init</span><span class="p">({</span> 
+        <span class="nx">stateField</span><span class="o">:</span> <span class="s2">"state"</span><span class="p">,</span> 
+        <span class="nx">globalChange</span><span class="o">:</span> <span class="nx">itemChanged</span><span class="p">,</span> 
+        <span class="nx">globalRevert</span><span class="o">:</span> <span class="nx">itemReverted</span> 
+    <span class="p">});</span>
+</pre>
+</div>
+
+
+<p>There are loads of features planned, watch this space.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-19623118-4");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
