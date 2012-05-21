@@ -23,7 +23,6 @@ hookpunch = (function () {
             hookpunch.options = $.extend({
                 parentLink: true,
                 trackState: true,
-                history: false
             }, hookpunch.options, options);
 
             // load all of the extensions and init them
@@ -38,7 +37,7 @@ hookpunch = (function () {
     hookpunch.observable = function (data) {
 
         var self = this;
-
+        
         // gets a unique sequential id for items.
         self.getUniqueId = function () {
 
@@ -51,13 +50,15 @@ hookpunch = (function () {
 
         self.init = function (data) {
 
-            ko.mapping.fromJS(data, {}, self);
+            ko.mapping.fromJS(data, { }, self);
+            self['isDirty'] = ko.observable(false);
+
             self._hookpunch = {};
 
             self._hookpunch.id = self.getUniqueId();
             self._hookpunch.undoCalled = false;
 
-            hookpunch.history[self._hookpunch.id] = { originalObject: data, changes: new Array() };
+            hookpunch.history[self._hookpunch.id] = { changes: new Array() };
 
             for (prop in self) {
                 if (self[prop] != null && self[prop].extend != undefined && prop != hookpunch.options.stateField) {
@@ -74,6 +75,14 @@ hookpunch = (function () {
                     if (hookpunch.options.history) {
                         self[prop].extend({ trackHistory: { propertyName: prop, hookpunchId: self._hookpunch.id} });
                     }
+                }
+            }
+
+            if (self[hookpunch.options.stateField] !== hookpunch.states.NEW) {
+
+                var originalItem = hookpunch.utils.stripItem(self);
+                if (!hookpunch.utils.contains(hookpunch.trackState.originalItems, originalItem)) {
+                    hookpunch.trackState.originalItems.push(originalItem)
                 }
             }
         }

@@ -9,7 +9,10 @@ hookpunch.history = (function () {
     hookpunch.history.init = function () {
         if (!hookpunch.initialised) {
             if (hookpunch.options.history) {
-                hookpunch.history = { undoFlag: false, busyRevertingValue: false };
+                hookpunch.history = {
+                    undoFlag: false, 
+                    busyRevertingValue: false
+                };
             }
         }
     }
@@ -17,7 +20,6 @@ hookpunch.history = (function () {
     ko.extenders.trackHistory = function (target, options) {
 
         target.propertyName = options.propertyName;
-        target.revertValue = target.originalState[target.propertyName];
         target.version = 0;
 
         target.subscribe(function (newValue) {

@@ -4,12 +4,16 @@
 
 hookpunch.trackState = (function () {
 
-    hookpunch.trackState = {};
+    hookpunch.trackState = { originalItems: [] };
 
     hookpunch.trackState.init = function () {
 
         // tracks the item state
         ko.extenders.trackState = function (target, options) {
+
+            if (!target.parent) {
+                throw "The parentLink library is required.";
+            }
 
             target.originalValue = options.originalValue;
             target.originalState = target.parent[hookpunch.options.stateField]();
@@ -19,6 +23,11 @@ hookpunch.trackState = (function () {
             }
 
             target.subscribe(function (newValue) {
+
+                var originalParentObject = hookpunch.utils.findByHookpunchId(hookpunch.trackState.originalItems, target.parent._hookpunch.id);
+                var currentParentState = hookpunch.utils.stripItem(target.parent);
+                var isDirty = !hookpunch.utils.compareExcludingState(originalParentObject, currentParentState);
+
 
                 var changed = target.originalValue !== newValue;
                 if (changed) {
@@ -34,8 +43,9 @@ hookpunch.trackState = (function () {
                         target.parent.change(target.parent);
                     }
 
-                    // fire the global event handler for change
-                    if (hookpunch.options.globalChange) {
+                    // fire the global event handler for change on the entire object, only fires once when the object is first changed
+                    if (hookpunch.options.globalChange && !target.parent.isDirty() && isDirty) {
+                        target.parent.isDirty(isDirty);
                         hookpunch.options.globalChange(target.parent);
                     }
                 } else {
@@ -50,8 +60,9 @@ hookpunch.trackState = (function () {
                         target.parent.revert(target.parent);
                     }
 
-                    // fire the global event handler for change
-                    if (hookpunch.options.globalRevert) {
+                    // fire the global event handler for when the object is reverted to its original state. 
+                    if (hookpunch.options.globalRevert && target.parent.isDirty() && !isDirty) {
+                        target.parent.isDirty(isDirty);
                         hookpunch.options.globalRevert(target.parent);
                     }
                 }

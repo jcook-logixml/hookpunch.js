@@ -4,7 +4,7 @@
 
 hookpunch.parentLink = (function () {
 
-    hookpunch.parentLink = {};
+    hookpunch.parentLink = { };
 
     hookpunch.parentLink.init = function () {
         if (!hookpunch.initialised) {
