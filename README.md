@@ -1,17 +1,13 @@
 hookpunch.js
 ============
 
-**hookpunch.js** adds *state tracking* to a specified field on observable Knockout.js objects. 
-It also provides helper functions for *filtering out only the objects that have changed* from 
-observableCollections. This is useful when working with serialized server objects on the client 
-side, or when you *only want to send updated objects* back to the server.
+**hookpunch.js** adds *state tracking*, *undo funtionality* and a link to the parent object to observable Knockout.js objects. ~~It also provides helper functions for filtering out only the objects that have changed from observableCollections.~~ (not yet, coming soon!).
 
-You only require the hookpunch.js scripts to make this work, but it does depend on [knockout] and 
-the knockout mapping plugin. I split the functionality into different files because it feel cleaner 
-and makes more sense to me that way. 
+I reckon that this library will help developers who build rich web applications that are light on traffic (you can send back only changed objects) and heavy on functionality (you can now undo changes made to view models, soon you will be able to roll back to a specified version of a view model).
 
-*Run the build.bat file in the Build folder to output the latest version as a minified and debug 
-build to the lib folder.*
+You only require the hookpunch.js scripts to make this work, but it does depend on [knockout] and the knockout mapping plugin. I split the functionality into different files because it feel cleaner and makes more sense to me that way. 
+
+*Run the build.bat file in the Build folder to output the latest version as a debug and minified build to the lib folder.* A closurecmd tool is included in the build folder which requires the .NET framework to run. It hits the Google Closure compiler service to minify the script. The project page for this handy little tool is at http://mightystassen.github.com/closurecmd/
 
 ##Basic Usage
 
@@ -29,7 +25,7 @@ Then, initialise hookpunch.js with the field that you want to track.
 	hookpunch.init({ stateField: "state" });
 ```
 
-Then, create a stateTrackedItem
+Then, create a *hookpunch* observable
 
 ```js
 	var stateTrackedItem = new hookpunch.observable({
