@@ -1,7 +1,7 @@
 hookpunch.js
 ============
 
-**hookpunch.js** adds *state tracking*, *undo funtionality* and a link to the parent object to observable Knockout.js objects. ~~It also provides helper functions for filtering out only the objects that have changed from observableCollections.~~ (not yet, coming soon!).
+**hookpunch.js** (only 4kb minified) adds *state tracking*, *undo funtionality* and a link to the parent object to observable Knockout.js objects. ~~It also provides helper functions for filtering out only the objects that have changed from observableCollections.~~ (not yet, coming soon!).
 
 I reckon that this library will help developers who build rich web applications that are light on traffic (you can send back only changed objects) and heavy on functionality (you can now undo changes made to view models, soon you will be able to roll back to a specified version of a view model).
 
